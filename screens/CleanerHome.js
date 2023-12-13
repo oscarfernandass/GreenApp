@@ -19,8 +19,9 @@ const CleanerHome=()=>{
     Toast.show({
       type: 'success',
       position: 'top',
-      text1: 'Welocme',
+      text1: 'Welcome',
       // Optional, add more lines if needed
+      fontSize:90,
       visibilityTime: 3000,
       autoHide: true,
       topOffset: 10,

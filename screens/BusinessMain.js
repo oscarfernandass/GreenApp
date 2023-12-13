@@ -20,7 +20,7 @@ import logger from '../logger.png';
 import log from '../log.png';
 const { width, height } = Dimensions.get('window');
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const BusinessMain = ({route}) => {
   const navigate=useNavigation();
@@ -54,6 +54,7 @@ const BusinessMain = ({route}) => {
                             text: 'Logout',
                             onPress: () => {
                               navigation.navigate('Selection');
+                              AsyncStorage.removeItem('businessLoggedIn');
                               alert("Logged Out");
                             },
                           },

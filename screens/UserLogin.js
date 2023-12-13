@@ -34,14 +34,12 @@ const UserLogin = () => {
       }
       else{
       await AsyncStorage.setItem('userLoggedIn', 'true');
-      await AsyncStorage.setItem('userName', userName); 
-        navigation.navigate('UserMain',{userName: userName});
+      await AsyncStorage.setItem('userUserName', userName); 
+      navigation.navigate('UserMain',{userName: userName});
       }
 
   };
   const handleRegister = () => {
-    console.log('Email:', userName);
-    console.log('Password:', password);
     navigation.navigate('UserRegister');
   };
 

@@ -5,10 +5,23 @@ import LottieView from 'lottie-react-native';
 const { width, height } = Dimensions.get('window');
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const UserLogin = () => {
   const navigation=useNavigation();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleLogin =async () => {
+    if(userName==='' || password===''){
+      fillin();
+    }
+    else{
+      await AsyncStorage.setItem('cleanerLoggedIn', 'true');
+      await AsyncStorage.setItem('cleanerUserName', userName); 
+      navigation.navigate('CleanerMain',{userName: userName});
+    }
+    
+  };
 
   const fillin = () => {
     Toast.show({
@@ -24,15 +37,6 @@ const UserLogin = () => {
     });
   };
   
-  const handleLogin = () => {
-    if(userName==='' || password===''){
-      fillin();
-    }
-    else{
-      navigation.navigate('CleanerMain',{userName:userName});
-    }
-    
-  };
   const handleRegister = () => {
     console.log('Email:', userName);
     console.log('Password:', password);

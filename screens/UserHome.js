@@ -59,7 +59,8 @@ const UserHome=()=>{
     Toast.show({
       type: 'success',
       position: 'top',
-      text1: 'Welocme',
+      text1: 'Welcome',
+      fontSize:90,
       // Optional, add more lines if needed
       visibilityTime: 3000,
       autoHide: true,

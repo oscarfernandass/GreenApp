@@ -5,6 +5,8 @@ import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const BusinessLogin = () => {
   const navigation=useNavigation();
@@ -25,15 +27,21 @@ const BusinessLogin = () => {
     });
   };
 
-  const handleLogin = () => {
+  
+
+  const handleLogin =async () => {
     if(userName==='' || password===''){
       fillin();
     }
     else{
-      navigation.navigate('BusinessMain',{userName:userName});
+      await AsyncStorage.setItem('businessLoggedIn', 'true');
+      await AsyncStorage.setItem('businessUserName', userName); 
+      navigation.navigate('BusinessMain',{userName: userName});
     }
     
   };
+
+
   const handleRegister = () => {
     
     navigation.navigate('BusinessRegister')

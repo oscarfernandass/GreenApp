@@ -9,6 +9,7 @@ import CleanerLogs from './CleanerLogs.js';
 import CleanerDo from './CleanerDo.js';
 import UserReward from './UserReward.js';
 import CleanerQr from './CleanerQr.js';
+import CleanerDoMain from './CleanerDoMain.js';
 import { Dimensions,Image ,TouchableOpacity,Alert} from 'react-native';
 import homeIcon from '../homeIcon.png';
 import mapIcon from '../mapIcon.png';
@@ -21,7 +22,7 @@ import toclean from '../toclean.png';
 import cleanto from '../cleanto.png'
 const { width, height } = Dimensions.get('window');
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const CleanerMain = ({route}) => {
   const navigate=useNavigation();
@@ -55,6 +56,7 @@ const CleanerMain = ({route}) => {
                             text: 'Logout',
                             onPress: () => {
                               navigation.navigate('Selection');
+                              AsyncStorage.removeItem('cleanerLoggedIn');
                               alert("Logged Out");
                             },
                           },
@@ -78,8 +80,8 @@ const CleanerMain = ({route}) => {
         />
 
         <Tab.Screen
-         name='CleanerDo' 
-         component={CleanerDo}
+         name='CleanerDoMain' 
+         component={CleanerDoMain}
          options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Image
