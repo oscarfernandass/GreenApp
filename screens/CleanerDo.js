@@ -1,9 +1,28 @@
-import { StyleSheet, Text, View,ScrollView } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View,ScrollView,Dimensions,FlatList} from 'react-native'
+import React,{useEffect,useState} from 'react'
 import CleanerDoList from './CleanerDoList'
 import { useNavigation } from '@react-navigation/native'
 import LottieView from 'lottie-react-native'
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+const { width, height } = Dimensions.get('window');
+
 const CleanerDo = () => {
+
+    const [works, setWorks] = useState([]);
+
+    const getData = async () => {
+      let res = await axios.get(`https://bullfrog-rich-recently.ngrok-free.app/collector/getBookings/${await AsyncStorage.getItem("cleanerUserName")}`);
+      let dt = await res.data;
+
+      console.log(dt["bookings"]);
+      setWorks(dt["bookings"]);
+    }
+    
+    useEffect(() => {
+      getData();
+    }, []);
+
     const navigation=useNavigation();
   return (
     <View style={styles.container}>
@@ -13,39 +32,25 @@ const CleanerDo = () => {
         <Text style={styles.text}>Today's Work</Text>
         </View>
 
-        <ScrollView>
+        <FlatList showsVerticalScrollIndicator={false}
+            style={styles.flat}
+            data={works}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View>
+                <CleanerDoList
+                name={item.name}
+                status={item.status}
+                date={item.date}
+                latitude={item.latitude}
+                longitude={item.longitude}
+                />
+              </View>
+            )}
+            />
 
 
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
-      <CleanerDoList name={"hi"} date={"hello"} address={"rbrb"}
-      latitude={10.9367228} longitude={76.9564628}
-      />
       
-
-        </ScrollView>
     </View>
   )
 }
@@ -57,6 +62,10 @@ const styles = StyleSheet.create({
         display:'flex',
         justifyContent:'center',
         alignItems:'center',
+    },
+    scroll:{
+      width:width,
+      alignItems:'center',
     },
     text:{
         color:'black',

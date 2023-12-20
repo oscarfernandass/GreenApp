@@ -6,11 +6,12 @@ import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Start = () => {
+
   const navigation = useNavigation();
   
   return (
     <View style={styles.outer}>
-      <Text style={{fontFamily:'cursive',  fontSize: 60,color:'#408F45',fontWeight:'200' }}>Green Watch</Text>
+      <Text style={{fontFamily:'cursive',  fontSize: 60,color:'#408F45',fontWeight:'200' }}>Green Voucher</Text>
       <LottieView
         source={require('../started.json')}
         autoPlay

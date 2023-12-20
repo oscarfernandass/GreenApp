@@ -2,13 +2,14 @@ import { TouchableOpacity, Text, Easing } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
-
+import CleanerChatBot from './CleanerChatBot';
 const Stack = createNativeStackNavigator();
 import CleanerHome from './CleanerHome';
 import CleanerInformation from './CleanerInformation';
 
 
-const CleanerHomer = () => {
+const CleanerHomer = ({route}) => {
+  const Nam=route.params.Name;
 
   return (
     // <NavigationContainer>
@@ -16,6 +17,7 @@ const CleanerHomer = () => {
         <Stack.Screen
           name="CleanerHome"
           component={CleanerHome}
+          initialParams={{ Game: Nam }}
           options={{
             headerShown: false,
           }}
@@ -23,6 +25,14 @@ const CleanerHomer = () => {
         <Stack.Screen
           name="CleanerInformation"
           component={CleanerInformation}
+          initialParams={{ Game: Nam }}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="CleanerChatBot"
+          component={CleanerChatBot}
           options={{
             headerShown: false,
           }}

@@ -6,13 +6,60 @@ import LottieView from 'lottie-react-native';
 const { width, height } = Dimensions.get('window');
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const UserLogin = () => {
+const UserLogin = ({route}) => {
   const navigation=useNavigation();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const[loader,setLoader]=useState(false);
+  const showToast3 = () => {
+    Toast.show({
+      type: 'success',
+      position: 'top',
+      text1: 'Registration Success',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const showToast1 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'User not found',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const showToast2 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Incorrect Password',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
 
-  
+  useEffect(() => {
+    // Check if showToast parameter is true
+    if (route.params?.showToast1) {
+      showToast3();
+    }
+   
+  }, [route.params?.showToast1]);
 
   const fillin = () => {
     Toast.show({
@@ -33,9 +80,37 @@ const UserLogin = () => {
         fillin();
       }
       else{
-      await AsyncStorage.setItem('userLoggedIn', 'true');
-      await AsyncStorage.setItem('userUserName', userName); 
-      navigation.navigate('UserMain',{userName: userName});
+        setLoader(true);
+        let data ={
+          "username" : userName,
+          "password" : password
+        }
+
+        
+        let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/public/signin", data);
+        console.log(data);
+        let dt = await res.data;
+
+        console.log(dt["status"]);
+        if(dt["status"]==="Incorrect Password"){
+          setLoader(false);
+          showToast2();
+        }
+        else if(dt["status"]==="User not found"){
+          setLoader(false);
+          showToast1();
+        }
+        else{
+          await AsyncStorage.setItem('userLoggedIn', 'true');
+          await AsyncStorage.setItem('userUserName', userName); 
+          navigation.navigate('UserMain',{userName: userName});
+          setLoader(false);
+        }
+
+        //  LOG  Incorrect Password
+        //  LOG  User not found
+        //  LOG  Login Successful
+      
       }
 
   };
@@ -45,6 +120,17 @@ const UserLogin = () => {
 
   return (
     <>
+    <Toast/>
+      {loader?(
+        <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+          width: 90,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginLeft: -45, // Half of the element's width
+          marginTop: -45, // Half of the element's height
+        }} />
+      ):(
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
@@ -88,14 +174,7 @@ const UserLogin = () => {
   </View>
 
     </KeyboardAvoidingView>
-{/* <LottieView source={require('../plant.json')} autoPlay loop onError={console.error} style={{height:100,width:100,position: 'absolute',
-  bottom: 0,
-  zIndex:1,
-  alignSelf: 'center',
-  height: 150,
-  width: 1500,
-  pointerEvents: 'none',
-  marginBottom: -30,}} /> */}
+      )}
     
   </>
   );

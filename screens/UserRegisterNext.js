@@ -3,19 +3,61 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Keyboa
 import user from '../user.png';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import LottieView  from 'lottie-react-native';
+import Toast from 'react-native-toast-message';
 
 const { width, height } = Dimensions.get('window');
 
 const UserRegisterNext = ({route}) => {
+
+
+
+  const showToast1 = () => {
+    Toast.show({
+      type: 'success',
+      position: 'top',
+      text1: 'Profile Completed',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const fillin = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Please Fill All Attributes',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+
+
+
+
+
     const navigation=useNavigation();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [address, setAddress] = useState('');
+  const[loader,setLoader]=useState(false);
+
 
   const handleSubmit = async () => {
-    navigation.navigate('UserLogin');
+    if(fullName==="" || email==="" || mobileNumber==="" || address===""){
+      fillin();
+    }
+    else{
 
+    setLoader(true);
     let data = {
       "username" : route.params.username,
       "password" : route.params.password,
@@ -23,16 +65,38 @@ const UserRegisterNext = ({route}) => {
       "email" : email,
       "full_name" : fullName
     }
-    let res = await axios.post("https://localhost:8000/auth/public/signup", data);
-    let dt = await res.data();
-
+    
+    console.log(data);
+    
+    let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/public/completeProfile", data);
+    let dt = await res.data;
     console.log(dt["status"]);
+    if(dt["status"]==="Profile Completed"){
+      setLoader(false);
+      showToast1();
+      navigation.navigate('UserLogin',{showToast1: true});
+    }
   }
+}
 
     
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <>
+    <Toast/>
+      {loader?(
+        <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+          width: 90,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginLeft: -45, // Half of the element's width
+          marginTop: -45, // Half of the element's height
+        }} />
+      ):
+      (
+        <KeyboardAvoidingView style={styles.container}>
+
       <View style={styles.content}>
         <Image source={user} style={styles.userImg} />
         <Text style={styles.regText}>Registration</Text>
@@ -44,14 +108,14 @@ const UserRegisterNext = ({route}) => {
         placeholder="Enter your Full Name"
         placeholderTextColor="black"
         onChangeText={(text) => setFullName(text)}
-      />
+        />
       <TextInput
         style={styles.input}
         value={email}
         placeholder="Enter your Email"
         placeholderTextColor="black"
         onChangeText={(text) => setEmail(text)}
-      />
+        />
       <TextInput
         style={styles.input}
         value={mobileNumber}
@@ -59,7 +123,7 @@ const UserRegisterNext = ({route}) => {
         placeholderTextColor="black"
         keyboardType="numeric"
         onChangeText={(text) => setMobileNumber(text)}
-      />
+        />
       <TextInput
   style={[styles.input, styles.textArea]}
   value={address}
@@ -73,7 +137,10 @@ const UserRegisterNext = ({route}) => {
       <TouchableOpacity style={styles.regButton} onPress={handleSubmit} >
         <Text style={styles.regButtonText}>Register</Text>
       </TouchableOpacity>
+
     </KeyboardAvoidingView>
+)}
+</>
   );
 };
 

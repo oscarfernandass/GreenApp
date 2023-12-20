@@ -1,5 +1,5 @@
-import { Text, StyleSheet, View,Dimensions,TouchableOpacity,ScrollView,Image } from 'react-native'
-import { useState } from 'react';
+import { Text, StyleSheet, View,Dimensions,TouchableOpacity,ScrollView,Image,FlatList} from 'react-native'
+import { useEffect, useState } from 'react';
 const { width, height } = Dimensions.get('window');
 import LottieView from 'lottie-react-native';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,9 +7,62 @@ import greenLand from '../greenLand.jpg';
 import greenPeople from '../greenPeople.jpg';
 import Konari from '../Konari.jpg';
 import trashBox from '../trashBox.jpg';
+import axios from 'axios';
+import ImageContain from './ImageContain';
+import UserVoucher from './UserVoucher';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const UserReward = () => {
-  const [coins, setCoins] = useState(49);
+  const [coins, setCoins] = useState(0);
+  const [rewards, setRewards] = useState([]);
+  const[uri,setUri]=useState('');
+  const [logs, setLogs] = useState([]);
+  const[loader,setLoader]=useState(false);
+  const[refreshing,setRefreshing]=useState(false);
+  const navigation=useNavigation();
+  const handleRefresh=()=>{
+    setRefreshing(true);
+    getRewards();
+    getCoins();
+    setRefreshing(false);
+  }
+
+  const getRewards = async () => {
+    try {
+      setLoader(true);
+      const res = await axios.get("https://bullfrog-rich-recently.ngrok-free.app/rewards/view/all");
+      const dt = await res.data;
+      // console.log(dt);
+      setLogs(dt);
+
+      var base64Icon = `data:image/png;base64,${dt[0]["image"]}`
+      setUri(base64Icon);
+      setLoader(false);
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+    }
+    setLoader(false);
+  };
+
+  const getCoins = async () => {
+    let res = await axios.get(`https://bullfrog-rich-recently.ngrok-free.app/getcoins/${await AsyncStorage.getItem("userUserName")}`);
+    let dt = res.data;
+
+    console.log(dt);
+
+    setCoins(dt["coins"]);
+  }
+
+  useEffect(() => {
+    getCoins();
+    getRewards();
+  }, []);
+  const handles=()=>{
+    getCoins();
+    getRewards();
+  }
 
   return (
     <View style={styles.outer}>
@@ -18,61 +71,46 @@ const UserReward = () => {
           <LottieView source={require('../coin.json')} autoPlay loop onError={console.error} style={{ height: 90, width: 90 }} />
           <Text style={styles.coin}>{coins}</Text>
         </View>
-        <TouchableOpacity style={{ backgroundColor: 'green', height: 60, width: 130, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}>
+        <TouchableOpacity style={{ backgroundColor: 'green', height: 60, width: 130, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}
+        onPress={()=>{
+          navigation.navigate('UserVoucher');
+        }}
+        >
           <Text style={{ color: 'white', fontSize: 25 }}>Vouchers</Text>
         </TouchableOpacity>
       </View>
-      
-        <ScrollView contentContainerStyle={styles.container}>
-          <TouchableOpacity style={styles.Mapper}>
-
-            <View style={styles.imgView}>
-              <Image style={styles.img} source={greenLand} />
-            </View>
-
-            <View style={styles.textView}>
-              <Text style={styles.text}>Green Land Kochi</Text>
-            </View>
-
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.Mapper}>
-
-            <View style={styles.textView}>
-              <Text style={styles.text}>Green People Kochi</Text>
-            </View>
-
-            <View style={styles.imgView}>
-              <Image style={styles.img} source={greenPeople} />
-            </View>
-
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.Mapper}>
-
-            <View style={styles.imgView}>
-              <Image style={styles.img} source={Konari} />
-            </View>
-
-            <View style={styles.textView}>
-              <Text style={styles.text}>Konari Waste Center</Text>
-            </View>
-
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.Mapper}>
-
-            <View style={styles.textView}>
-              <Text style={styles.text}>Trash Box Kochi</Text>
-            </View>
-
-            <View style={styles.imgView}>
-              <Image style={styles.img} source={trashBox} />
-            </View>
-
-          </TouchableOpacity>
-
-        </ScrollView>
+      {loader?(
+         <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 70,
+          width: 70,
+          alignSelf:'center',
+          justifyContent:'center',
+          marginTop:50,
+           // Half of the element's width
+           // Half of the element's height
+        }} />
+      ):(
+      <FlatList showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            style={styles.flat}
+            data={logs}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View>
+                <ImageContain
+                businessName = {item.businessName}
+                name = {item.name}
+                points = {item.points}
+                description = {item.description}
+                image = {item.image}
+                handles={handles}
+                />
+              </View>
+            )}
+            />
+      )}
+       
+        
       
     </View>
   );

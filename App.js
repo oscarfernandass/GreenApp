@@ -19,6 +19,7 @@ import UserRegisterNext from './screens/UserRegisterNext';
 import CleanerRegisterNext from './screens/CleanerRegisterNext';
 import CleanerMain from './screens/CleanerMain';
 import BusinessMain from './screens/BusinessMain';
+import SuperMain from './screens/SuperMain';
 
 const App = () => {
 
@@ -126,6 +127,13 @@ const App = () => {
         <Stack.Screen
           name="CleanerMain"
           component={CleanerMain}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="SuperMain"
+          component={SuperMain}
           options={{
             headerShown: false,
           }}

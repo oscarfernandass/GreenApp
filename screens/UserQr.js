@@ -5,10 +5,11 @@ import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 
-const UserQr = () => {
+const UserQr = ({route}) => {
+  const fame=route.params.name;
   return (
     <View style={styles.outer}>
-      <QRCode value="oscar" size={300} />
+      <QRCode value={fame} size={300} />
       <View style={{display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
       <LottieView source={require('../scan.json')} autoPlay loop onError={console.error} style={{height:50,width:50}} />
       <Text style={{color:'black',fontWeight:'800',fontSize:20}}>Show the above Qr to Cleaner</Text>

@@ -3,13 +3,86 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Keyboa
 import user from '../user.png';
 import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
-
+import Toast from 'react-native-toast-message';
+import axios from 'axios';
+import LottieView from 'lottie-react-native';
 const UserRegister = () => {
+
+  const showToast2 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Username already exists',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const showToast3 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Password must contain an Upper Case , Lower Case and number',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  // const showToast2 = () => {
+  //   Toast.show({
+  //     type: 'error',
+  //     position: 'top',
+  //     text1: 'Username already exists',
+  //     // Optional, add more lines if needed
+  //     visibilityTime: 3000,
+  //     autoHide: true,
+  //     topOffset: 10,
+  //     bottomOffset: 40,
+  //     // backgroundColor: 'green', // Set your desired background color
+  //   });
+  // };
+  // const showToast3 = () => {
+  //   Toast.show({
+  //     type: 'error',
+  //     position: 'top',
+  //     text1: 'Password must contain one uppercase , lowercase and number',
+  //     // Optional, add more lines if needed
+  //     visibilityTime: 3000,
+  //     autoHide: true,
+  //     topOffset: 10,
+  //     bottomOffset: 40,
+  //     // backgroundColor: 'green', // Set your desired background color
+  //   });
+  // };
+  // const checker1=route.params.name;
+  // const checker2=route.params.password;
+  
   const navigation=useNavigation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpass, setConfirmpass] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(false);
+  const[loader,setLoader]=useState(false);
+  const fillin = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Please Fill All Attributes',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+ 
 
   useEffect(() => {
     function check(a, b) {
@@ -23,8 +96,53 @@ const UserRegister = () => {
     setPasswordsMatch(match);
   }, [password, confirmpass]);
 
+
+  const handleSubmit = async () => {
+    if(username==="" || password==="" || confirmpass===""){
+      fillin();
+    }
+    else{
+
+    setLoader(true);
+    let data = {
+      "username" : username,
+      "password" : password
+    }
+
+    console.log(data);
+
+    let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/public/signup", data);
+    let dt = await res.data;
+
+    console.log(dt);
+    if(dt["status"]==="Password does not meet requirements"){
+      setLoader(false);
+      showToast3();
+    }
+    else if(dt["status"]==="Username already exists"){
+      setLoader(false);
+      showToast2();
+    }
+    else{
+      navigation.navigate('UserRegisterNext', {"username" : username, "password" : password});
+    }
+  }
+}
   return (
+    <>
+    <Toast/>
+      {loader?(
+        <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+          width: 90,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginLeft: -45, // Half of the element's width
+          marginTop: -45, // Half of the element's height
+        }} />
+      ):(
     <KeyboardAvoidingView style={styles.container}>
+      <Toast/>
       <View style={styles.content}>
         <Image source={user} style={styles.userImg} />
         <Text style={styles.regText}>Registration</Text>
@@ -44,7 +162,7 @@ const UserRegister = () => {
         placeholderTextColor="black"
         secureTextEntry
         onChangeText={(text) => setPassword(text)}
-      />
+        />
       <TextInput
         style={styles.input}
         value={confirmpass}
@@ -59,12 +177,12 @@ const UserRegister = () => {
         </Text>
       )}
 
-      <TouchableOpacity style={styles.regButton} onPress={() =>{
-        navigation.navigate('UserRegisterNext', {"username" : username, "password" : password});
-      }}>
+      <TouchableOpacity style={styles.regButton} onPress={handleSubmit}>
         <Text style={styles.regButtonText}>Register</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
+      )}
+</>
   );
 };
 

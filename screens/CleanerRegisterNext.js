@@ -4,37 +4,90 @@ import { Picker } from '@react-native-picker/picker';
 import user from '../cleaner.png';
 import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
-
-const UserRegister = () => {
+import axios from 'axios';
+import LottieView from 'lottie-react-native';
+import Toast from 'react-native-toast-message';
+const UserRegister = ({route}) => {
   const navigation=useNavigation();
   const [type, setType] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
   const [full_name, setFullName] = useState('');
+  const[loader,setLoader]=useState(false);
 
-  const handleTypeChange = (selectedType) => {
-    setType(selectedType);
+  const fillin = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Please Fill All Attributes',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
   };
 
+  const handleSubmit = async () => {
+    if(type==="" || mobile==="" || email==="" || full_name===""){
+      fillin();
+    }
+    else{
+
+    setLoader(true);
+
+    let data = {
+      "employeeId" : route.params.employeeId,
+      "password" : route.params.password,
+      "mobile" : mobile,
+      "email" : email,
+      "full_name" : full_name,
+      "type" : type 
+    }
+
+    console.log(data);
+
+    let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/worker/completeProfile", data);
+    let dt = await res.data;
+
+    console.log(dt["status"]);
+
+    if(dt["status"]==="Profile Completed"){
+      navigation.navigate('CleanerLogin',{showToast1: true});
+      setLoader(false);
+    }
+  }
+
+  }
+
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <>
+      {loader?(
+        <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+          width: 90,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginLeft: -45, // Half of the element's width
+          marginTop: -45, // Half of the element's height
+        }} />
+        ):(
+          <KeyboardAvoidingView style={styles.container}>
+      <Toast/>
       <View style={styles.content}>
         <Image source={user} style={styles.userImg} />
         <Text style={styles.regText}>Registration</Text>
       </View>
 
-      <View style={styles.input}>
-      <Picker
-        selectedValue={type}
-        style={styles.picker}
-        
-        onValueChange={(itemValue) => handleTypeChange(itemValue)}
-      >
-        <Picker.Item label="Select Type" value="" />
-        <Picker.Item label="Supervisor" value="Supervisor" />
-        <Picker.Item label="Worker" value="Worker" />
-      </Picker>
-        </View>
+      
+      <TextInput
+        style={styles.input}
+        value={type}
+        placeholder="Enter your Full Name"
+        placeholderTextColor="black"
+        onChangeText={(text) => setType(text)}
+        />
 
       <TextInput
         style={styles.input}
@@ -43,29 +96,28 @@ const UserRegister = () => {
         placeholderTextColor="black"
         keyboardType="numeric"
         onChangeText={(text) => setMobile(text)}
-      />
+        />
       <TextInput
         style={styles.input}
         value={email}
         placeholder="Enter your Email (Optional)"
         placeholderTextColor="black"
         onChangeText={(text) => setEmail(text)}
-      />
+        />
       <TextInput
         style={styles.input}
         value={full_name}
         placeholder="Enter your Full Name"
         placeholderTextColor="black"
         onChangeText={(text) => setFullName(text)}
-      />
+        />
 
-      <TouchableOpacity style={styles.regButton} onPress={() =>{
-        navigation.navigate('CleanerLogin');
-        alert("Registration Successfull");
-      }}>
+      <TouchableOpacity style={styles.regButton} onPress={handleSubmit}>
         <Text style={styles.regButtonText}>Register</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
+      )}
+</>
   );
 };
 

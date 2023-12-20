@@ -1,28 +1,43 @@
 import { TouchableOpacity, Text, Easing } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 
 const Stack = createNativeStackNavigator();
 import BusinessHome from './BusinessHome';
 import BusinessInformation from './BusinessInformation';
+import BusinessChatBot from './BusinessChatBot';
 
 
-const BusinessHomer = () => {
-
+const BusinessHomer = ({route}) => {
+  const navigation=useNavigation();
+  const name=route.params.Name;
+  // console.log(name);
   return (
     // <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
           name="BusinessHome"
           component={BusinessHome}
+          initialParams={{ name: name }}
+          options={({ navigation }) => ({
+            // userName: route.params.userName,
+            headerShown: false,
+          })}
+        />
+        <Stack.Screen
+          name="BusinessInformation"
+          component={BusinessInformation}
+          initialParams={{ name: name }}
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="BusinessInformation"
-          component={BusinessInformation}
+          name="BusinessChatBot"
+          component={BusinessChatBot}
+          initialParams={{ name: name }}
           options={{
             headerShown: false,
           }}

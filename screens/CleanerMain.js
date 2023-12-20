@@ -9,6 +9,8 @@ import CleanerLogs from './CleanerLogs.js';
 import CleanerDo from './CleanerDo.js';
 import UserReward from './UserReward.js';
 import CleanerQr from './CleanerQr.js';
+import UserComm from './UserComm.js';
+import group from '../group.png';
 import CleanerDoMain from './CleanerDoMain.js';
 import { Dimensions,Image ,TouchableOpacity,Alert} from 'react-native';
 import homeIcon from '../homeIcon.png';
@@ -23,16 +25,20 @@ import cleanto from '../cleanto.png'
 const { width, height } = Dimensions.get('window');
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import UserCommMain from './UserCommMain.js';
 const Tab = createBottomTabNavigator();
 const CleanerMain = ({route}) => {
   const navigate=useNavigation();
-  const name ="Hi " +route?.params?.userName;  
+  const bot=route?.params?.employeeId; 
+  const name ="Hi " +bot; 
+  console.log(bot)
   return (
       <Tab.Navigator>
 
         <Tab.Screen
           name={name}
           component={CleanerHomer}
+          initialParams={{ Name: bot }}
           options={({ navigation }) => ({
             tabBarIcon: ({ focused, color, size }) => (
               <Image
@@ -79,6 +85,7 @@ const CleanerMain = ({route}) => {
             })}
         />
 
+
         <Tab.Screen
          name='CleanerDoMain' 
          component={CleanerDoMain}
@@ -87,20 +94,41 @@ const CleanerMain = ({route}) => {
             <Image
               source={focused ? cleanto : cleanto}
               style={{ width: size, height: size, tintColor: color }}
-            />
-          ),
+              />
+              ),
           headerRight: () => (
             <TouchableOpacity
-              style={{ marginRight: 16 }}
+            style={{ marginRight: 16 }}
               onPress={() => navigation.openDrawer()}
-            >
+              >
               <Image source={cleanto} style={{ width: 37, height: 37 }} />
             </TouchableOpacity>
           )
         }}
          />
         <Tab.Screen
-         name='CleanerLogs' 
+                 name='UserCommMain'
+                 component={UserCommMain}
+                 options={{
+                  tabBarIcon: ({ focused, color, size }) => (
+                    <Image
+                      source={focused ? group : group}
+                      style={{ width: 37, height: 37, tintColor: color }}
+                    />
+                  ),
+                  headerRight: () => (
+                    <TouchableOpacity
+                      style={{ marginRight: 16 }}
+                      onPress={() => navigation.openDrawer()}
+                    >
+                      <Image source={group} style={{ width: 37, height: 37 }} />
+                    </TouchableOpacity>
+                  )
+                }}
+                 />
+        <Tab.Screen
+         name='CleanerLogs'
+         initialParams={{ nam:bot }} 
          component={CleanerLogs}
          options={{
           tabBarIcon: ({ focused, color, size }) => (

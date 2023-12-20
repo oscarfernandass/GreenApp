@@ -7,12 +7,22 @@ const LogContain = (props) => {
       <TouchableOpacity style={styles.Mapper}>
 {/* <LottieView source={require('../cleaner.json')} autoPlay loop onError={console.error} style={{height:100,width:120,marginTop:10}} /> */}
 
-<View style={styles.textView}>
-  <Text style={styles.text}>{props.text}</Text>
+<View style={styles.first}>
+  <Text>Date</Text>
+  <Text style={styles.text}>{props.date}</Text>
 </View>
 
 <View style={styles.textView}>
-  <Text style={styles.text}>{props.time} Units Collected</Text>
+
+  <View style={{display:'flex',justifyContent:'center',alignItems:'center',backgroundColor:'black',height:70,width:120,borderRadius:10}}>
+    <Text>Location</Text>
+  <Text style={styles.text}>{props.location}</Text>
+  </View>
+
+  <View style={{display:'flex',justifyContent:'center',alignItems:'center',backgroundColor:'black',height:70,width:120,borderRadius:10}}>
+    <Text>Amount:</Text>
+  <Text style={styles.text}>{props.amount}</Text>
+  </View>
 </View>
 
 </TouchableOpacity>
@@ -25,25 +35,25 @@ export default LogContain
 const styles = StyleSheet.create({
     Mapper: {
         backgroundColor: '#408F45',
-        height: 80, // Adjust the height as needed
+        height: 140, // Adjust the height as needed
         width: 300,
         borderRadius: 10,
-        // marginBottom: 15,
-        marginTop:15,
-        display:'flex',
+        marginTop:10,
+        flex:1,
         justifyContent: 'center',
         alignItems: 'center',
-        flexDirection:'row',
+        flexDirection:'column',
         borderColor:'black',
         borderWidth:0.4,
+        gap:5,
         // flexWrap:'wrap',
         // gap:5,
 
       },
       text:{
         color:'black',
-        fontSize:20,
-        textAlign:'center',
+        fontSize:17,
+        // textAlign:'center',
         color:'white',
       },
       imgView:{
@@ -55,13 +65,17 @@ const styles = StyleSheet.create({
         // marginRight:-10,
     },
     textView:{
-        width:150,
         display:'flex',
         justifyContent:'center',
         alignItems:'center',
-        // textAlign:'center',
-        // marginRight:0,
-        fontSize:20,
+        flexDirection:'row',
+        gap:40,
+    },
+    first:{
+      display:'flex',
+      flexDirection:'column',
+      justifyContent:'center',
+      alignItems:'center',
     }
     
 })

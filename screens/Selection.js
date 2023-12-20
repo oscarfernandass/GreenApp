@@ -26,9 +26,14 @@ const Selection = () => {
 
     const checkCleanerLoginStatus = async () => {
       const cleanerLoggedIn = await AsyncStorage.getItem('cleanerLoggedIn');
+      const superLoggedIn = await AsyncStorage.getItem('superLoggedIn');
       if (cleanerLoggedIn === 'true') {
-        const storedUserName = await AsyncStorage.getItem('cleanerUserName');
-        navigation.navigate('CleanerMain',{userName: storedUserName});
+        const storedemployeeId = await AsyncStorage.getItem('cleanerUserName');
+        navigation.navigate('CleanerMain',{employeeId: storedemployeeId});
+      }
+      else if(superLoggedIn==="true"){
+        const storedemployeeId = await AsyncStorage.getItem('superUserName');
+        navigation.navigate('SuperMain',{employeeId: storedemployeeId});
       }
       else{
         navigation.navigate('CleanerLogin');

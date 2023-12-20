@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView,Image } from 'react-native';
 import user from '../business.png';
 import LottieView from 'lottie-react-native';
@@ -6,12 +6,14 @@ import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 
-const BusinessLogin = () => {
+const BusinessLogin = ({route}) => {
   const navigation=useNavigation();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const[loader,setLoader]=useState(false);
   
   const fillin = () => {
     Toast.show({
@@ -26,6 +28,49 @@ const BusinessLogin = () => {
       // backgroundColor: 'green', // Set your desired background color
     });
   };
+  const showToast3 = () => {
+    Toast.show({
+      type: 'success',
+      position: 'top',
+      text1: 'Registration Success',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const showToast1 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'User not found',
+      // Optional, add more lines if needed
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+      // backgroundColor: 'green', // Set your desired background color
+    });
+  };
+  const showToast2 = () => {
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Incorrect Password',
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 10,
+      bottomOffset: 40,
+    });
+  };
+  useEffect(() => {
+    if (route.params?.showToast1) {
+      showToast3();
+    }
+   
+  }, [route.params?.showToast1]);
 
   
 
@@ -34,9 +79,36 @@ const BusinessLogin = () => {
       fillin();
     }
     else{
-      await AsyncStorage.setItem('businessLoggedIn', 'true');
-      await AsyncStorage.setItem('businessUserName', userName); 
-      navigation.navigate('BusinessMain',{userName: userName});
+      setLoader(true);
+      let data = {
+        "username" : userName,
+        "password" : password
+      }
+
+      console.log(data);
+
+      let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/business/signin", data);
+      let dt = await res.data;
+
+      console.log(dt["status"]);
+      if(dt["status"]==="Login Successful"){
+        await AsyncStorage.setItem('businessLoggedIn', 'true');
+        await AsyncStorage.setItem('businessUserName', userName); 
+        navigation.navigate('BusinessMain',{userName: userName});
+        setLoader(false);
+      }
+      else if(dt["status"]==="User not found"){
+        setLoader(false);
+          showToast1();
+      }
+      else if(dt["status"]==="Incorrect Password"){
+        setLoader(false);
+          showToast2();
+      }
+      //  LOG  Login Successful
+      //  LOG  User not found
+      //  LOG  Incorrect Password
+
     }
     
   };
@@ -49,6 +121,17 @@ const BusinessLogin = () => {
 
   return (
     <>
+    <Toast/>
+      {loader?(
+        <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+          width: 90,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          marginLeft: -45, // Half of the element's width
+          marginTop: -45, // Half of the element's height
+        }} />
+      ):(
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
@@ -91,6 +174,7 @@ const BusinessLogin = () => {
   }} />
   </View>
     </KeyboardAvoidingView>
+      )}
 
 </>
   );

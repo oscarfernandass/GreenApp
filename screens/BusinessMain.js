@@ -1,15 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import { createStackNavigator } from '@react-navigation/stack';
-// import { createDrawerNavigator } from '@react-navigation/drawer';
-// import CleanerHomer from './CleanerHomer.js';
 import BusinessHomer from './BusinessHomer.js';
-// import UserMap from './UserMap.js';
-// import CleanerLogs from './CleanerLogs.js';
 import UserReward from './UserReward.js';
 import BusinessLogs from './BusinessLogs.js';
-// import CleanerQr from './CleanerQr.js';
+import UserComm from './UserComm.js';
+import group from '../group.png';
 import { Dimensions,Image ,TouchableOpacity,Alert} from 'react-native';
 import homeIcon from '../homeIcon.png';
 import mapIcon from '../mapIcon.png';
@@ -18,19 +14,22 @@ import qrIcon from '../qrIcon.png';
 import profileIcon from '../profileIcon.png';
 import logger from '../logger.png';
 import log from '../log.png';
+import UserCommMain from './UserCommMain.js';
 const { width, height } = Dimensions.get('window');
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const BusinessMain = ({route}) => {
   const navigate=useNavigation();
-  const name ="Hi " +route?.params?.userName;  
+  const name ="Hi " +route?.params?.userName; 
+  const game=route?.params?.userName; 
   return (
       <Tab.Navigator>
 
         <Tab.Screen
           name={name}
           component={BusinessHomer}
+          initialParams={{ Name: game }}
           options={({ navigation }) => ({
             tabBarIcon: ({ focused, color, size }) => (
               <Image
@@ -69,13 +68,35 @@ const BusinessMain = ({route}) => {
               headerLeft: () => (
                 <TouchableOpacity
                 style={{ marginLeft: 16 }}
-                onPress={() => navigation.navigate('CleanerInformation')}
+                onPress={() => navigation.navigate('BusinessInformation')}
                 >
                   <Image source={profileIcon} style={{ width: 37, height: 37 }} />
                 </TouchableOpacity>
               )
             })}
         />
+
+<Tab.Screen
+         name='UserCommMain' 
+         component={UserCommMain}
+         options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Image
+              source={focused ? group : group}
+              style={{ width: 37, height: 37, tintColor: color }}
+            />
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.openDrawer()}
+            >
+              <Image source={group} style={{ width: 37, height: 37 }} />
+            </TouchableOpacity>
+          )
+        }}
+         />
+
 
         <Tab.Screen
          name='BusinesLogs' 

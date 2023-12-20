@@ -6,16 +6,18 @@ import React from 'react';
 const Stack = createNativeStackNavigator();
 import UserHome from './UserHome';
 import UserInformation from './UserInformation';
+import UserChatBot from './UserChatBot';
 
 
-const UserHomer = () => {
-
+const UserHomer = ({route}) => {
+  const jet=route.params.name;
   return (
     // <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
           name="UserHome"
           component={UserHome}
+          initialParams={{nami:jet}}
           options={{
             headerShown: false,
           }}
@@ -23,6 +25,13 @@ const UserHomer = () => {
         <Stack.Screen
           name="UserInformation"
           component={UserInformation}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="UserChatBot"
+          component={UserChatBot}
           options={{
             headerShown: false,
           }}

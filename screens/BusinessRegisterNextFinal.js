@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Image } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Image,ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import user from '../business.png';
 import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 import {launchCamera,launchImageLibrary} from 'react-native-image-picker';
-const BusinessRegisterNextFinal = () => {
+import axios from 'axios';
+import LottieView from 'lottie-react-native';
+import Toast from 'react-native-toast-message';
+// import { ScrollView } from 'react-native-gesture-handler';
+const BusinessRegisterNextFinal = ({route}) => {
     const navigation=useNavigation();
-    const [type, setType] = useState('');
-    const [mobile, setMobile] = useState('');
-    const [email, setEmail] = useState('');
-    const [businessName, setBusinessName] = useState('');
-    const [description, setDescription] = useState('');
+    // const [type, setType] = useState('');
+    // const [mobile, setMobile] = useState('');
+    // const [email, setEmail] = useState('');
+    // const [businessName, setBusinessName] = useState('');
     const [images, setImages] = useState('');
+    const [loader,setLoader]=useState(false);
     
 
     const ImagePicker=()=>{
@@ -26,24 +30,70 @@ const BusinessRegisterNextFinal = () => {
             setImages(response.assets[0].uri);
         });
     }
+    const fillin = () => {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Please Fill All Attributes',
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 10,
+        bottomOffset: 40,
+      });
+    };
+
+    const handleSubmit = async () => {
+      if(images===""){
+        fillin();
+      }
+      else{
+
+      setLoader(true);
+      let form = new FormData();
+
+      form.append('file', {
+        uri : images,
+        name: route.params.username + ".jpeg",
+        type: "image/jpeg"
+      });
+
+      form.append("username", route.params.username);
+
+      let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/auth/business/upload", form , {
+        headers : {
+          'Content-Type' : 'multipart/form-data',
+        }
+      });
+      let dt = await res.data;
+  
+      console.log(dt["status"]);
+      navigation.navigate('BusinessLogin',{showToast1: true});
+      setLoader(false);
+    }        
+    }
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <>
+    {loader?(
+      <LottieView source={require('../welcomee.json')} autoPlay loop onError={console.error} style={{ height: 90,
+        width: 90,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginLeft: -45, // Half of the element's width
+        marginTop: -45, // Half of the element's height
+      }} />
+      ):(
+        
+        <KeyboardAvoidingView style={styles.container}>
+      <Toast/>
+      {/* <ScrollView> */}
+
       <View style={styles.content}>
         <Image source={user} style={styles.userImg} />
         <Text style={styles.regText}>Registration</Text>
       </View>
 
-          
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={description}
-        placeholder="Enter Business Description"
-        placeholderTextColor="black"
-        multiline
-        numberOfLines={4} // You can adjust the number of lines as needed
-        onChangeText={(text) => setDescription(text)}
-        />
         <TouchableOpacity onPress={()=>ImagePicker()} style={styles.button}>
         <Text style={styles.buttonText}>Upload Image</Text>
       </TouchableOpacity>
@@ -54,13 +104,13 @@ const BusinessRegisterNextFinal = () => {
         {/* ))} */}
       </View>
 
-      <TouchableOpacity style={styles.regButton} onPress={() =>{
-          navigation.navigate('CleanerLogin');
-          alert("Registration Successfull");
-        }}>
+      <TouchableOpacity style={styles.regButton} onPress={handleSubmit}>
         <Text style={styles.regButtonText}>Register</Text>
       </TouchableOpacity>
+          {/* </ScrollView> */}
     </KeyboardAvoidingView>
+      )}
+      </>
   );
 };
 export default BusinessRegisterNextFinal;
@@ -136,6 +186,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+    textAlign:'center',
   },
   imageContainer: {
     flexDirection: 'row',

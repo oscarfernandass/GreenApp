@@ -6,6 +6,7 @@ import { RNCamera } from 'react-native-camera';
 import LottieView from 'lottie-react-native';
 import Toast from 'react-native-toast-message';
 import ModalView from './ModalView';
+import axios from 'axios';
   // App.propTypes = {
   //   someProp: StyleSheet.style,
   //   // other props
@@ -36,7 +37,7 @@ const CleanerQr=()=>{
   const closeQr=()=>{
     setScanner(false);
   }
-  const openner = (data) => {
+  const openner = async (data) => {
     try {
       setQrdata(data['data']);
       console.log(qrdata);
@@ -49,6 +50,8 @@ const CleanerQr=()=>{
       //   alert("Invalid link");
       //   setLoading(false);
       // }
+   
+
     } catch (error) {
       alert("Error: " + error.message);
       setLoading(false);
@@ -64,11 +67,15 @@ const CleanerQr=()=>{
         name="Add Post"
         title={"Book Cleaner"}
         onDismiss={() => setVisible(false)}
-        onSubmit={() => {
+        onSubmit={async () => {
           setVisible(false);
           setScanner(false);
           showToast1();
-          
+          setAmount('');
+          setLoading(false);
+          let res = await axios.post(`https://bullfrog-rich-recently.ngrok-free.app/assigncoins/${qrdata}/${amount}`);
+          let dt = await res.data;
+          console.log(dt);
         }}
         cancelable
         >

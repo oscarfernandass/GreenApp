@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const BusinessInformation = () => {
+const BusinessInformation = ({route}) => {
+  const dame=route.params.name;
   return (
     <View style={styles.container}>
-      <Text style={styles.informText}>BusinessInformation</Text>
+      <Text style={styles.informText}>{dame} BusinessInformation</Text>
     </View>
   )
 }

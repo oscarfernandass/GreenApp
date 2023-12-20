@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View,Dimensions,ScrollView,Image,TouchableOpacity,TextInput, BackHandler } from 'react-native'
+import { Text, StyleSheet, View,Dimensions,ScrollView,Image,TouchableOpacity,TextInput, BackHandler,Platform } from 'react-native'
 import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,35 +8,37 @@ import ModalView from './ModalView';
 import { useState,useEffect} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Geolocation from '@react-native-community/geolocation';
-// import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import robot from '../robot1.png'
 import DatePicker from 'react-native-modern-datepicker';
-// import { createDrawerNavigator } from '@react-navigation/drawer';
-// const Drawer=createDrawerNavigator();
+import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import CheckBox from 'react-native-check-box';
+import axios from 'axios';
 const { width, height } = Dimensions.get('window');
-const UserHome=()=>{
+const UserHome=({route})=>{
   const showToast1 = () => {
     Toast.show({
       type: 'success',
       position: 'top',
       text1: 'Booked Successfully',
-      // Optional, add more lines if needed
       visibilityTime: 3000,
       autoHide: true,
       topOffset: 10,
       bottomOffset: 40,
-      // backgroundColor: 'green', // Set your desired background color
     });
   };
 
   const[visible,setVisible]=useState(false);
-  const[userName,setUserName]=useState('');
+  const[userName,setUserName]=useState(route.params.nami);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [address, setAddress] = useState('');
   const[date,setDate]=useState('');
   const[latitude,setLatitude]=useState('');
   const[longitude,setLongitude]=useState('');
+  const[isChecked,setIsChecked]=useState(false);
+  
+  const navigation=useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -95,17 +97,35 @@ const UserHome=()=>{
 
     return (
       <>
+      <TouchableOpacity style={styles.robot}
+      onPress={()=>{
+        navigation.navigate('UserChatBot');
+      }}
+      >
+        <Image source={robot} style={styles.roboimg}/>
+      </TouchableOpacity>
       <ModalView style={styles.uploadbox}
         visible={visible}
         name="Add Post"
         title={"Book Cleaner"}
         onDismiss={() => setVisible(false)}
-        onSubmit={() => {
+        onSubmit={async () => {
           setVisible(false);
+          
+          let data = {
+            "name" : userName,
+            "date" : date,
+            "latitude" : latitude,
+            "longitude" : longitude
+          }
+          console.log(data);
+
+          let res = await axios.post("https://bullfrog-rich-recently.ngrok-free.app/public/bookPickup", data);
+          let dt = await res.data;
+          
+          console.log(dt);
           showToast1();
-          
-          
-          
+
         }}
         cancelable
         >
@@ -121,6 +141,7 @@ const UserHome=()=>{
             />
           <View style={styles.pick}>
            <DatePicker
+           value={date}
            onSelectedChange={date => setDate(date)}
            style={{
              height:300,
@@ -136,6 +157,16 @@ const UserHome=()=>{
             numberOfLines={4} // You can adjust the number of lines as needed
             onChangeText={(text) => setAddress(text)}
             />
+
+            <View style={{display:'flex',alignItems:'center',flexDirection:'row'}}>
+            <CheckBox
+            isChecked={isChecked}
+            onClick={()=>{
+              setIsChecked(!isChecked);
+            }}
+            />
+            <Text style={{fontSize:15,color:'black'}}>Use Current Location</Text>
+            </View>
           
 
           </ModalView>
@@ -146,6 +177,11 @@ const UserHome=()=>{
         <View style={styles.first}>
         <LottieView source={require('../tree.json')} autoPlay loop={false} speed={3.0}   onError={console.error} style={{height:200,width:200}} />
         <Text style={{color:'black', fontWeight:700,fontSize:20}}>Garbage Free Nation</Text>
+        <TouchableOpacity style={styles.create} onPress={()=>{
+          setVisible(true);
+          }}>
+          <Text style={styles.book}>Book Cleanup</Text>
+        </TouchableOpacity>
         <Text style={{color:'black', textAlign:'center',fontSize:15,}}>A garbage-free nation envisions a cleaner, healthier environment where waste is minimized and properly managed.</Text>
         </View>
 
@@ -170,11 +206,7 @@ const UserHome=()=>{
       <Toast/>
 
       </ScrollView>
-        <TouchableOpacity style={styles.create} onPress={()=>{
-          setVisible(true);
-          }}>
-          <Text style={styles.book}>Book Cleanup</Text>
-        </TouchableOpacity>
+        
       </>
     );
 }
@@ -218,19 +250,23 @@ const styles = StyleSheet.create({
       marginTop:5,
     },
     create:{
+      display:'flex',
       backgroundColor:'black',
       // backgroundColor:'#408F45',
       borderRadius:25,
-      position:'absolute',
+      // height:50,
+      // position:'absolute',
       alignSelf:'center',
-      top:540,
+      justifyContent:'center',
+      alignItems:'center',
+      // top:540,
       
       
       // zIndex:1,
     },
     book:{
-      fontSize:20,
-      padding:18,
+      fontSize:15,
+      padding:15,
       color:'white',
     },
     inputText:{
@@ -263,5 +299,30 @@ const styles = StyleSheet.create({
       color: 'black',
       fontSize: 30,
     },
+    robot:{
+      height:50,
+      width:50,
+      zIndex:3,
+      backgroundColor:'transparent',
+      position:'absolute',
+      bottom:"3%",
+      right:"6.5%",
+      // borderColor:'black',
+      // borderWidth:2,
+      // display:'flex',
+      // justifyContent:'center',
+      // alignItems:'center',
 
+    },
+    roboimg:{
+
+      height:55,
+      width:55,
+      position:'absolute',
+      zIndex:3,
+      borderColor:'black',
+      // borderWidth:2.5,
+      // borderRadius:100,
+
+    }
 })
